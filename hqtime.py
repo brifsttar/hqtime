@@ -53,7 +53,7 @@ def main():
             # options.use_chromium = True
             options.headless = True
             # HQTime buttons fails at default res
-            # options.add_argument("window-size=1920,1080")
+            options.add_argument("window-size=1920,1080")
             # options.add_argument("user-data-dir=EDGE_USER_DATA_DIR")
             # options.add_argument(r'--profile-directory=EDGE_USER_PROFILE')
 
