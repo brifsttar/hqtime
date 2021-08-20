@@ -3,15 +3,16 @@ import time
 from time import sleep
 import logging as log
 from datetime import datetime as dt
+from random import randrange
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.keys import Keys
-from msedge.selenium_tools import EdgeOptions, Edge
+# from selenium.common.exceptions import TimeoutException
+# from selenium.webdriver.common.keys import Keys
+# from msedge.selenium_tools import EdgeOptions, Edge
 
 from config import *
 
@@ -39,6 +40,17 @@ def main():
     if r != 6:
         log.info(f"User declined WFH")
         return
+
+    hours = []
+    random_offset_range = 30
+    now = dt.now()
+    for h in WFH_HOURS:
+        # Offset in minutes
+        offset = randrange(random_offset_range) - (random_offset_range / 2.)
+        # To hour
+        h += offset / 60
+        hour = now.replace(hour=int(h), minute=int(60 * (h % 1)), second=0)
+        hours.append(hour)
 
     while True:
         try:
@@ -75,12 +87,11 @@ def main():
             WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'CHKFCT_BAD')))
 
             badgeages = len(driver.find_elements_by_xpath('//div[@id="G"]//table[@role="presentation"]/tbody/tr'))
-            if badgeages >= len(WFH_HOURS):
+            if badgeages >= len(hours):
                 log.info("Done for the day")
                 return
-            next_hour = WFH_HOURS[badgeages]
+            next_badgeage = hours[badgeages]
             now = dt.now()
-            next_badgeage = now.replace(hour=int(next_hour), minute=int(60*(next_hour % 1)), second=0)
             time_to = (next_badgeage - now).total_seconds()
             if time_to < 0:
                 log.info("Badging")
