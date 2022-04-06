@@ -5,6 +5,7 @@ import logging as log
 from datetime import datetime as dt
 from random import randrange
 
+import keyring
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -73,7 +74,7 @@ def main():
             driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=options)
             driver.get("https://hqtime.ifsttar.fr/")
             driver.find_element_by_id("USERID").send_keys(USERNAME)
-            driver.find_element_by_id("XXX_PASSWORD").send_keys(PASSWORD)
+            driver.find_element_by_id("XXX_PASSWORD").send_keys(keyring.get_password(*PASSWORD))
             driver.find_element_by_id('connect').submit()
             # We need to actually select the password field for it to be autofilled
             # driver.find_element_by_id("XXX_PASSWORD").send_keys(Keys.RETURN)

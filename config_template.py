@@ -1,5 +1,7 @@
 USERNAME = ''
-PASSWORD = ''
+# You have to feed secrets first
+# python -m keyring set hqtime username
+PASSWORD = ("hqtime", "username")
 # Wednesday, friday
 WFH_DAYS = [2, 4]
 # 8h, 12h, 12h45, 18h
