@@ -34,7 +34,15 @@ def main():
         ]
     )
     now = dt.now()
-    if now.weekday() not in WFH_DAYS:
+    if not WFH_DAYS:
+        # If there's no user-defined WFH days, we ask if current time is earlier than clock-out time
+        if now.weekday() > 4:
+            return
+        h = WFH_HOURS[-1]
+        clock_out = now.replace(hour=int(h), minute=int(60 * (h % 1)), second=0)
+        if now > clock_out:
+            return
+    elif now.weekday() not in WFH_DAYS:
         log.info(f"{now} is not WFH")
         return
     r = message_box('HQTime Auto-badgeage', 'WFH today?', 3)
@@ -55,12 +63,11 @@ def main():
 
     while True:
         try:
-            # Currently, password is stored in plaintext in config.py, which is baaaaaad
             # I'd like to use autofill from the browser, but for that you need to load a profile
             # Since I always have Chrome running on my computer, I can't use my profile in two
             # Chrome instances
             # Instead, I set up an Edge profile, because I'm definitely not going to use Edge myself
-            # However there's a but which makes autofill not work in headless, so, yeah...
+            # However there's a bug which makes autofill not work in headless, so, yeah...
             # options = EdgeOptions()
             options = Options()
             # options.use_chromium = True
