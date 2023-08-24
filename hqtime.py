@@ -6,14 +6,13 @@ from datetime import datetime as dt
 from random import randrange
 
 import keyring
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-# from selenium.common.exceptions import TimeoutException
-# from selenium.webdriver.common.keys import Keys
-# from msedge.selenium_tools import EdgeOptions, Edge
+from selenium.webdriver.chrome.service import Service
 
 from config import *
 
@@ -63,26 +62,22 @@ def main():
 
     while True:
         try:
-            # I'd like to use autofill from the browser, but for that you need to load a profile
-            # Since I always have Chrome running on my computer, I can't use my profile in two
-            # Chrome instances
-            # Instead, I set up an Edge profile, because I'm definitely not going to use Edge myself
-            # However there's a bug which makes autofill not work in headless, so, yeah...
-            # options = EdgeOptions()
+            # I'd like to use autofill from the browser, but there's a bug which makes autofill not work in headless,
+            # so, yeah...
             options = Options()
             # options.use_chromium = True
             options.headless = True
             # HQTime buttons fails at default res
             options.add_argument("window-size=1920,1080")
-            # options.add_argument("user-data-dir=EDGE_USER_DATA_DIR")
-            # options.add_argument(r'--profile-directory=EDGE_USER_PROFILE')
+
+            service = Service(executable_path=ChromeDriverManager().install())
 
             # driver = Edge(executable_path=EDGE_DRIVER_PATH, options=options)
-            driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=options)
+            driver = webdriver.Chrome(service=service, options=options)
             driver.get("https://hqtime.ifsttar.fr/")
-            driver.find_element_by_id("USERID").send_keys(USERNAME)
-            driver.find_element_by_id("XXX_PASSWORD").send_keys(keyring.get_password(*PASSWORD))
-            driver.find_element_by_id('connect').submit()
+            driver.find_element(By.ID, "USERID").send_keys(USERNAME)
+            driver.find_element(By.ID, "XXX_PASSWORD").send_keys(keyring.get_password(*PASSWORD))
+            driver.find_element(By.ID, 'connect').submit()
             # We need to actually select the password field for it to be autofilled
             # driver.find_element_by_id("XXX_PASSWORD").send_keys(Keys.RETURN)
 
@@ -90,11 +85,11 @@ def main():
             WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'cbx_image'))).click()
             WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'role_2'))).click()
             WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'INDICATORS_cpn_2')))
-            driver.find_element_by_xpath('//*[@title="WBA"]').click()
+            driver.find_element(By.XPATH, '//*[@title="WBA"]').click()
 
             WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'CHKFCT_BAD')))
 
-            badgeages = len(driver.find_elements_by_xpath('//div[@id="G"]//table[@role="presentation"]/tbody/tr'))
+            badgeages = len(driver.find_elements(By.XPATH,'//div[@id="G"]//table[@role="presentation"]/tbody/tr'))
             if badgeages >= len(hours):
                 log.info("Done for the day")
                 return
@@ -103,9 +98,9 @@ def main():
             time_to = (next_badgeage - now).total_seconds()
             if time_to < 0:
                 log.info("Badging")
-                driver.find_element_by_xpath('//*[@class="btnbad_btn"]').click()
+                driver.find_element(By.XPATH,'//*[@class="btnbad_btn"]').click()
                 WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'modale_title')))
-                driver.find_element_by_xpath('//div[@class="modale_bottom button"]//input[@value="Oui"]').click()
+                driver.find_element(By.XPATH,'//div[@class="modale_bottom button"]//input[@value="Oui"]').click()
                 sleep(1)
                 driver.close()
             else:
