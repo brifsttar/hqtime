@@ -4,6 +4,7 @@ from time import sleep
 import logging as log
 from datetime import datetime as dt
 from random import randrange
+import os
 
 import keyring
 from webdriver_manager.chrome import ChromeDriverManager
@@ -70,7 +71,12 @@ def main():
             # HQTime buttons fails at default res
             options.add_argument("window-size=1920,1080")
 
-            service = Service(executable_path=ChromeDriverManager().install())
+            chrome_install = ChromeDriverManager().install()
+
+            folder = os.path.dirname(chrome_install)
+            chromedriver_path = os.path.join(folder, "chromedriver.exe")
+
+            service = Service(executable_path=chromedriver_path)
 
             # driver = Edge(executable_path=EDGE_DRIVER_PATH, options=options)
             driver = webdriver.Chrome(service=service, options=options)
