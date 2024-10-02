@@ -70,6 +70,8 @@ def main():
             options.headless = True
             # HQTime buttons fails at default res
             options.add_argument("window-size=1920,1080")
+            # https://stackoverflow.com/questions/79004567/selenium-headless-broke-after-chrome-update
+            options.add_argument('--window-position=-2400,-2400')
 
             chrome_install = ChromeDriverManager().install()
 
