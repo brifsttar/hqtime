@@ -23,7 +23,8 @@ def main():
         level=log.INFO,
         handlers=[
             log.FileHandler("tempo.log"),
-            log.StreamHandler()
+            log.StreamHandler(),
+            #TODO Discord handler?
         ]
     )
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -36,6 +37,7 @@ def main():
         '--badgeage-times',
         nargs=4,
         type=float,
+        metavar=("Entrée-matin", "Sortie-midi", "Entrée-après-midi", "Sortie-soir"),
         default=[8, 12, 12.75, 18],
         help='Times around which to badge'
     )
@@ -71,9 +73,7 @@ def main():
                 # 1. Login on CAS
                 page.goto("http://tempo.univ-eiffel.fr/")
                 page.fill("#username", args.username)
-                pwd = keyring.get_password("tempo", args.username)
-                page.fill("#password", pwd)
-                del pwd
+                page.fill("#password", keyring.get_password("tempo", args.username))
                 page.click('button[type="submit"]')
                 page.wait_for_url("**/webquartz/ux/home")
 
@@ -103,6 +103,7 @@ def main():
                     style = element.get_attribute("style")
                     match = re.search(r"grid-column:\s*(\d+)\s*/", style)
                     if match:
+                        #TODO Handle half-day absences properly
                         absence_day = (int(match.group(1)) - 1) // 2
                         if absence_day == today:
                             log.info("Today has a legitimate absence, exiting")
