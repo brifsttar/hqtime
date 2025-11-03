@@ -90,7 +90,7 @@ def main():
 
                 # 2.2 Find current day index
                 header = page.locator("[class*='planning-header']")
-                current_day = header.locator("[class*='current']")
+                current_day = header.locator("[class*='current'][class*='selectable']")
                 parent =  current_day.locator("..").element_handle()
                 current_handle = current_day.element_handle()
                 today = parent.evaluate("(parent, el) => Array.from(parent.children).indexOf(el)", current_handle)
