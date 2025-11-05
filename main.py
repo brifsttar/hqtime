@@ -97,7 +97,8 @@ def main():
 
                 # 2.3 Check for absences on current day
                 planning = page.locator("[class*='planning-individual']")
-                absences = planning.locator("[class*='planning-item__abs']")
+                absences_line = planning.locator('[data-dragcontext="absence"]')
+                absences = absences_line.locator("[class*='planning-item__abs']")
                 for i in range(absences.count()):
                     element = absences.nth(i)
                     style = element.get_attribute("style")
