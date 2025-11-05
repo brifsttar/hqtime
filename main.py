@@ -38,7 +38,7 @@ def main():
         nargs=4,
         type=float,
         metavar=("Entrée-matin", "Sortie-midi", "Entrée-après-midi", "Sortie-soir"),
-        default=[8, 12, 12.75, 18],
+        default=[8.75, 12, 12.75, 18],
         help='Times around which to badge'
     )
     parser.add_argument(
